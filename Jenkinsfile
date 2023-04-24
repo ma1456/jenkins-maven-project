@@ -1,26 +1,38 @@
 pipeline {
     agent any
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
-                sh 'mvn -f hello-app/pom.xml -B -DskipTests clean package'
-            }
-            post {
-                success {
-                    echo "Now Archiving the Artifacts....."
-                    archiveArtifacts artifacts: '**/*.jar'
-                }
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/ma1456/jenkins-maven-project.git']])
             }
         }
-        stage('Test') {
+       stage ("build Jar") {
             steps {
-                sh 'mvn -f hello-app/pom.xml test'
-            }
-            post {
-                always {
-                    junit 'hello-app/target/surefire-reports/*.xml'
-                }
+                sh "/opt/maven/bin/mvn -f hello-app/pom.xml clean package"
             }
         }
-    }
-}
+	stage('Upload'){
+            steps{
+                rtUpload (
+                 serverId:"jfrog" ,
+                  spec: '''{
+                   "files": [
+                      {
+                      "pattern": "*.jar",
+                      "target": "maven-local-repo/"
+                      }
+                            ]
+                           }''',
+                        )
+               }
+         }
+	stage ('Publish build info') {
+            steps {
+                rtPublishBuildInfo (
+                    serverId: "jfrog"
+                 )
+                }
+            }
+       
+        }
+  }
