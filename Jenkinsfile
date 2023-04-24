@@ -19,7 +19,7 @@ pipeline {
                    "files": [
                       {
                       "pattern": "*.jar",
-                      "target": "maven-local-repo/"
+                      "target": "maven-repo-local/"
                       }
                             ]
                            }''',
