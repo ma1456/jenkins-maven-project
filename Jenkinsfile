@@ -17,7 +17,7 @@ pipeline {
         }
        stage ("build Jar") {
             steps {
-                sh "/opt/maven/bin/mvn -f hello-app/pom.xml clean install"
+                sh "/opt/maven/bin/mvn -f hello-app/pom.xml clean install -U"
 
             }
         }
